@@ -6,22 +6,22 @@ function Products() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                setError(null);
-                setProducts(null);
-                setLoading(true);
-                const response = await axios.get(
-                    'http://13.209.50.192:8080/api/products/'
-                );
-                setProducts(response.data);
-            } catch (e) {
-                setError(e);
-            }
-            setLoading(false);
-        };
+    const fetchProducts = async () => {
+        try {
+            setError(null);
+            setProducts(null);
+            setLoading(true);
+            const response = await axios.get(
+                'http://13.209.50.192:8080/api/products/'
+            );
+            setProducts(response.data);
+        } catch (e) {
+            setError(e);
+        }
+        setLoading(false);
+    };
 
+    useEffect(() => {
         fetchProducts();
     }, []);
 
@@ -30,13 +30,16 @@ function Products() {
     if (!products) return null;
 
     return (
-        <ul>
-            {products.map(product => (
-                <li key={product.productId}>
-                    {product.name}
-                </li>
-                ))}
-        </ul>
+        <>
+            <ul>
+                {products.map(product => (
+                    <li key={product.productId}>
+                        {product.name}
+                    </li>
+                    ))}
+            </ul>
+            <button onClick={fetchProducts}>다시 불러오기</button>
+        </>
     )
 }
 
