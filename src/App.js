@@ -1,7 +1,8 @@
 import React from "react";
+import Products from "./Products";
 
 function App() {
-    return <>Hello!</>
+    return <Products />;
 }
 
 export default App;
