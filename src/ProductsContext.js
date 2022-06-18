@@ -1,69 +1,25 @@
 import React, {createContext, useContext, useReducer} from 'react';
-import axios from "axios";
+import createAsyncDispatcher, {createAsyncHandler, initialAsyncState} from "./asyncActionUtils";
+import * as api from "./api";
 
 const initialState = {
-    products: {
-        loading: false,
-        data: null,
-        error: null
-    },
-    product: {
-        loading: false,
-        data: null,
-        error: null
-    }
+    products: initialAsyncState,
+    product: initialAsyncState
 };
 
-const loadingState = {
-    loading: true,
-    data: null,
-    error: null
-};
-
-const success = data => ({
-    loading: false,
-    data,
-    error: null
-});
-
-const error = error => ({
-    loading: false,
-    data: null,
-    error: error
-});
+const productsHandler =createAsyncHandler('GET_PRODUCTS', 'products');
+const productHandler =createAsyncHandler('GET_PRODUCT', 'product');
 
 function productsReducer(state, action) {
     switch (action.type) {
         case 'GET_PRODUCTS':
-            return {
-                ...state,
-                products: loadingState
-            };
         case 'GET_PRODUCTS_SUCCESS':
-            return {
-                ...state,
-                products: success(action.data)
-            };
         case 'GET_PRODUCTS_ERROR':
-            return {
-                ...state,
-                products: error(action.error)
-            };
+            return productsHandler(state, action);
         case 'GET_PRODUCT':
-            return {
-                ...state,
-                product: loadingState
-            };
         case 'GET_PRODUCT_SUCCESS':
-            return {
-                ...state,
-                product: success(action.data)
-            };
         case 'GET_PRODUCT_ERROR':
-            return {
-                ...state,
-                product: error(action.error)
-            };
+            return productHandler(state, action);
         default:
             throw new Error(`Unhanded action type: ${action.type}`);
     }
@@ -99,26 +55,5 @@ export function useProductsDispatch() {
     return dispatch;
 }
 
-export async function getProducts(dispatch) {
-    dispatch({type: 'GET_PRODUCTS'});
-    try {
-        const response = await axios.get(
-            'http://13.209.50.192:8080/api/products/'
-        );
-        dispatch({type: 'GET_PRODUCTS_SUCCESS', data: response.data});
-    } catch (e) {
-        dispatch({type: 'GET_PRODUCTS_ERROR', error: e});
-    }
-}
-
-export async function getProduct(dispatch, id) {
-    dispatch({type: 'GET_PRODUCT'});
-    try {
-        const response = await axios.get(
-            `http://13.209.50.192:8080/api/products/${id}`
-        );
-        dispatch({type: 'GET_PRODUCT_SUCCESS', data: response.data});
-    } catch (e) {
-        dispatch({type: 'GET_PRODUCT_ERROR', error: e});
-    }
-}
+export const getProducts = createAsyncDispatcher('GET_PRODUCTS', api.getProducts);
+export const getProduct = createAsyncDispatcher('GET_PRODUCT', api.getProduct);
