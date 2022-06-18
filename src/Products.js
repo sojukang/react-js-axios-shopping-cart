@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import axios from "axios";
 import useAsync from "./useAsync";
+import Product from "./Product";
 
 async function getProducts() {
     const response = await axios.get(
@@ -10,6 +11,7 @@ async function getProducts() {
 }
 
 function Products() {
+    const [productId, setProductId] = useState(null);
     const [state, refetch] = useAsync(getProducts, [], true);
 
     const {loading, data: products, error} = state;
@@ -22,12 +24,17 @@ function Products() {
         <>
             <ul>
                 {products.map(product => (
-                    <li key={product.productId}>
+                    <li
+                        key={product.productId}
+                        onClick={() => setProductId(product.productId)}
+                        style={{cursor: 'pointer'}}
+                    >
                         {product.name}
                     </li>
                 ))}
             </ul>
             <button onClick={refetch}>다시 불러오기</button>
+            {productId && <Product id={productId} />};
         </>
     )
 }
